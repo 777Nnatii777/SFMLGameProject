@@ -4,6 +4,6 @@
 
 int main()
 {
-    std::cout << "Git working yes/no\n";
+    std::cout << "Git working yes/no dodawane z gita\n";
 }
 
