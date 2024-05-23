@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <ctime>
 
 class Start {
 public:
@@ -67,7 +68,7 @@ void maingra() {
     std::vector<sf::Color> colors = {
         sf::Color::Red, sf::Color::Green, sf::Color::Blue,
         sf::Color::Yellow, sf::Color::Magenta, sf::Color::Cyan,
-        sf::Color::White, sf::Color(200, 80, 130), sf::Color(128, 128, 128)
+        sf::Color(83,90,217), sf::Color(200, 80, 130), sf::Color(128, 128, 128)
     };
 
     std::vector<sf::RectangleShape> squares;
@@ -84,11 +85,47 @@ void maingra() {
         squares.push_back(square);
     }
 
+    std::srand(std::time(nullptr));
+    std::vector<int> randomIndices;
+    for (int i = 0; i < 3; ++i) {
+        int index = std::rand() % 9; // generate random index between 0 and 8
+        randomIndices.push_back(index);
+    }
+
+    sf::Clock startClock;
+    sf::Clock changeClock;
+    int currentSquare = 0;
+    bool reverseColor = false;
+    bool startedChanging = false;
+
     while (gameWindow.isOpen()) {
         sf::Event event;
         while (gameWindow.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 gameWindow.close();
+        }
+
+        if (startClock.getElapsedTime().asSeconds() > 3.0f) {
+            startedChanging = true;
+        }
+
+        if (startedChanging && changeClock.getElapsedTime().asSeconds() > 1.0f) {
+            changeClock.restart();
+
+            int index = randomIndices[currentSquare];
+            if (reverseColor) {
+                squares[index].setFillColor(colors[index]);
+                currentSquare++;
+            }
+            else {
+                squares[index].setFillColor(sf::Color::White);
+            }
+
+            reverseColor = !reverseColor;
+
+            if (currentSquare >= randomIndices.size()) {
+                break; // break the loop after all 3 squares have been changed
+            }
         }
 
         gameWindow.clear(sf::Color::Black);
