@@ -4,6 +4,8 @@
 #include <vector>
 #include <ctime>
 #include <cstdlib>
+#include <chrono> // std::chrono::microseconds
+#include <thread> // std::this_thread::sleep_for
 
 class clasprzegrana {
 private:
@@ -30,22 +32,20 @@ public:
         return oknoprzegrana;
     }
 
-
-
-
-    void sprawdzKlikniecie(sf::Event& event) {
+    bool sprawdzKlikniecie(sf::Event& event) {
         if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
             sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
 
             if (niebieski.getGlobalBounds().contains(mousePos)) {
-
                 oknoprzegrana.close();
+                return true; // Indicates that a new game should start
             }
             else if (czerwony.getGlobalBounds().contains(mousePos)) {
                 oknoprzegrana.close();
-                exit(0); // Dodajemy to, aby zamknąć cały program
+                exit(0); // Close the entire program
             }
         }
+        return false; // Indicates that no new game should start
     }
 
     void narysujbloki() {
@@ -56,8 +56,53 @@ public:
     }
 };
 
-class wygrana {
-    // Klasa wygrana, na razie pusta
+class claswygrana {
+private:
+    sf::RenderWindow oknowygrana;
+    sf::RectangleShape wygranablok;
+    sf::RectangleShape zakonczblok;
+
+public:
+    claswygrana() : oknowygrana(sf::VideoMode(400, 400), "SFML Window Game", sf::Style::Close | sf::Style::Titlebar | sf::Style::Resize) {
+        inicjalizowanieblokow();
+    }
+
+    void inicjalizowanieblokow() {
+        wygranablok.setFillColor(sf::Color::Green);
+        wygranablok.setSize(sf::Vector2f(150.0f, 100.0f));
+        wygranablok.setPosition(120.0f, 50.0f);
+
+        zakonczblok.setFillColor(sf::Color::Red);
+        zakonczblok.setSize(sf::Vector2f(150.0f, 100.0f));
+        zakonczblok.setPosition(120.0f, 220.0f);
+    }
+
+    sf::RenderWindow& pobierzoknowygrana() {
+        return oknowygrana;
+    }
+
+    bool sprawdzKlikniecie(sf::Event& event) {
+        if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+            sf::Vector2f mousePos(event.mouseButton.x, event.mouseButton.y);
+
+            if (wygranablok.getGlobalBounds().contains(mousePos)) {
+                oknowygrana.close();
+                return true; // Indicates that a new game should start
+            }
+            else if (zakonczblok.getGlobalBounds().contains(mousePos)) {
+                oknowygrana.close();
+                exit(0); // Close the entire program
+            }
+        }
+        return false; // Indicates that no new game should start
+    }
+
+    void narysujbloki() {
+        oknowygrana.clear(sf::Color::Black);
+        oknowygrana.draw(wygranablok);
+        oknowygrana.draw(zakonczblok);
+        oknowygrana.display();
+    }
 };
 
 class maingra {
@@ -78,10 +123,11 @@ private:
     bool flashred;
     bool wygrana;
     bool przegrana;
+    int level; // New variable to keep track of the current level
 
 public:
     maingra() : oknomaingra(sf::VideoMode(800, 800), "SFML Window Game", sf::Style::Close | sf::Style::Titlebar | sf::Style::Resize),
-        przeliczanie(0), bialycheck(false), currentsuareindex(-1), sequenceComplete(false), usermozeklikac(false), flashgreen(false), flashred(false) {
+        przeliczanie(0), bialycheck(false), currentsuareindex(-1), sequenceComplete(false), usermozeklikac(false), flashgreen(false), flashred(false), level(3) { // Initialize level to 3
         inicjalizowanieblokow();
         srand(static_cast<unsigned>(time(0)));
     }
@@ -112,7 +158,7 @@ public:
     }
 
     void aktualizujKolory() {
-        if (przeliczanie < 3) {
+        if (przeliczanie < level) { // Use level to determine the sequence length
             sf::Time elapsed = clock.getElapsedTime();
 
             if (!bialycheck && elapsed.asSeconds() >= 1.0f) {
@@ -216,16 +262,56 @@ public:
                     if (event.type == sf::Event::Closed) {
                         losewindow.pobierzoknoprzegana().close();
                     }
-                    losewindow.sprawdzKlikniecie(event);
+                    if (losewindow.sprawdzKlikniecie(event)) {
+                        przegrana = false; // Reset the lose state to allow the game to restart
+                        restartGame(); // Restart the game
+                    }
                 }
 
                 losewindow.narysujbloki();
+            }
+        }
+        if (wygrana) {
+            claswygrana winwindow;
+
+            while (winwindow.pobierzoknowygrana().isOpen()) {
+                sf::Event event;
+                while (winwindow.pobierzoknowygrana().pollEvent(event)) {
+                    if (event.type == sf::Event::Closed) {
+                        winwindow.pobierzoknowygrana().close();
+                    }
+                    if (winwindow.sprawdzKlikniecie(event)) {
+                        wygrana = false; // Reset the win state to allow the game to restart
+                        level++; // Increment the level
+                        restartGame(); // Restart the game
+                    }
+                }
+
+                winwindow.narysujbloki();
             }
         }
     }
 
     sf::RenderWindow& getWindow() {
         return oknomaingra;
+    }
+
+    void restartGame() {
+        squares.clear();
+        std::this_thread::sleep_for(std::chrono::seconds{ 2 });
+        poczatkowekolory.clear();
+        wylosowanasekwencja.clear();
+        wpisanasekwencja.clear();
+        przeliczanie = 0;
+        bialycheck = false;
+        currentsuareindex = -1;
+        sequenceComplete = false;
+        usermozeklikac = false;
+        flashgreen = false;
+        flashred = false;
+        wygrana = false;
+        przegrana = false;
+        inicjalizowanieblokow();
     }
 };
 
