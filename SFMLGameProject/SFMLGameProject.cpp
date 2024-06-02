@@ -13,10 +13,18 @@ private:
     sf::RenderWindow oknoprzegrana;
     sf::RectangleShape niebieski;
     sf::RectangleShape czerwony;
+    sf::Text tekstclasprzegrana;
+    sf::Font fontclasprzegrana;
+    sf::Text tekstclasprzegrana2;
 
 public:
     clasprzegrana() : oknoprzegrana(sf::VideoMode(800, 800), "SFML Window Game", sf::Style::Close | sf::Style::Titlebar | sf::Style::Resize) {
         inicjalizowanieblokow();
+
+        if (!fontclasprzegrana.loadFromFile("czcionkirobo/Roboto-Black.ttf")) {
+            std::cerr << "Błąd podczas ładowania czcionki" << std::endl;
+
+        }
     }
 
     void inicjalizowanieblokow() {
@@ -27,6 +35,21 @@ public:
         czerwony.setFillColor(sf::Color::Red);
         czerwony.setSize(sf::Vector2f(200.0f, 150.0f));
         czerwony.setPosition(450.0f, 325.0f);
+
+        tekstclasprzegrana.setFont(fontclasprzegrana);
+        tekstclasprzegrana.setString("Start a New");
+        tekstclasprzegrana.setCharacterSize(22);
+        tekstclasprzegrana.setFillColor(sf::Color::White);
+        tekstclasprzegrana.setPosition(190, 390);
+
+        tekstclasprzegrana2.setFont(fontclasprzegrana);
+        tekstclasprzegrana2.setString("Exit");
+        tekstclasprzegrana2.setCharacterSize(22);
+        tekstclasprzegrana2.setFillColor(sf::Color::White);
+        tekstclasprzegrana2.setPosition(530, 390);
+
+
+
     }
 
     sf::RenderWindow& pobierzoknoprzegana() {
@@ -53,6 +76,8 @@ public:
         oknoprzegrana.clear(sf::Color::Black);
         oknoprzegrana.draw(niebieski);
         oknoprzegrana.draw(czerwony);
+        oknoprzegrana.draw(tekstclasprzegrana);
+        oknoprzegrana.draw(tekstclasprzegrana2);
         oknoprzegrana.display();
     }
 };
@@ -480,6 +505,7 @@ public:
         oknostartmenu.draw(tekststartmenu);
         oknostartmenu.draw(tekststartmenu2);
         oknostartmenu.display();
+       
     }
 
     sf::RectangleShape& getczerwony() {
