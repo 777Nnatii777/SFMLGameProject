@@ -87,7 +87,7 @@ private:
     sf::RenderWindow oknowygrana;
     sf::RectangleShape wygranablok;
     sf::RectangleShape zakonczblok;
-    int punkty;
+    
     sf::Text tekstclaswygrana;
     sf::Font fontclaswygrana;
     sf::Text tekstclaswygrana2;
@@ -180,6 +180,7 @@ private:
     bool przegrana;
     int level; // New variable to keep track of the current level
     int points;
+    int rundy = 3;
     
     
    
@@ -209,12 +210,9 @@ public:
     sf::Text punkty;
     sf::Font font;
 
-    void setPoints(int points) {
-        this->points = points;
-        std::cout << "Points set to: " << points << std::endl;
-    }
+    
 
-    int rundy = 3;
+   
 
     void inicjalizowanieblokow() {
         std::vector<sf::Color> colors(9, sf::Color::White);
@@ -281,9 +279,36 @@ public:
         }
     }
 
-    //zwracanie punktow
-    int& pobierzpunkty() {
-        return points;
+    void dodpunkty() {
+        points = points + rundy;
+        rundy += 1;
+        inicjalizowaniepunkty();
+        narysujkwadraty(); // Ensure the squares and the updated points are drawn immediately
+        narysujpunkty();
+    }
+
+    void zerujpunkty() {
+        points = 0;
+        rundy += 3;
+        inicjalizowaniepunkty();
+        narysujkwadraty(); // Ensure the squares and the updated points are drawn immediately
+        narysujpunkty();
+    }
+
+    void  inicjalizowaniepunkty() {
+        oknomaingra.clear(sf::Color::Black);
+        punkty.setFont(font);
+        punkty.setString("Hello, you already have: " + std::to_string(points) + " points!");
+        punkty.setCharacterSize(20);
+        punkty.setFillColor(sf::Color::White);
+        punkty.setPosition(200, 700);
+
+    }
+
+    void narysujpunkty() {
+        
+        oknomaingra.draw(punkty);
+
     }
 
     void sprawdzKlikniecie(sf::Event& event) {
@@ -297,7 +322,9 @@ public:
 
                     if (wpisanasekwencja.size() == wylosowanasekwencja.size()) {
                         if (wpisanasekwencja == wylosowanasekwencja) {
+
                             /* dodawanie punktow */
+                           
                             
                             flashgreen = true;
                             
@@ -305,6 +332,7 @@ public:
                         }
                         else {
                             flashred = true;
+                            
                             clockodswiezania.restart();
                         }
                         wpisanasekwencja.clear();
@@ -325,11 +353,13 @@ public:
     }
 
     void flashAllGreen() {
+       
         if (flashgreen) {
+           
             if (clockodswiezania.getElapsedTime().asSeconds() < 0.5f) {
                 for (auto& square : squares) {
                     square.setFillColor(sf::Color::Green);
-                    
+                   
                 }
                 
             }
@@ -341,8 +371,10 @@ public:
             else {
                 
                 flashgreen = false;
-               
+                
                 wygrana = true;
+
+                dodpunkty();
             }
         }
     }
@@ -362,10 +394,13 @@ public:
             else {
                 flashred = false;
                 przegrana = true;
+                zerujpunkty();
             }
         }
 
         if (przegrana) {
+            points = 0;
+            rundy = 3;
             clasprzegrana losewindow;
 
             while (losewindow.pobierzoknoprzegana().isOpen()) {
@@ -376,6 +411,7 @@ public:
                     }
                     if (losewindow.sprawdzKlikniecie(event)) {
                         przegrana = false; // Reset the lose state to allow the game to restart
+                        level = 3;
                         restartGame(); // Restart the game
                     }
                 }
@@ -384,8 +420,7 @@ public:
             }
         }
         if (wygrana) {
-            points = points + rundy;
-            rundy += 1;
+            
             claswygrana winwindow;
             
             while (winwindow.pobierzoknowygrana().isOpen()) {
