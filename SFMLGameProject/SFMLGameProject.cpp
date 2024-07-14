@@ -62,14 +62,14 @@ public:
 
             if (niebieski.getGlobalBounds().contains(mousePos)) {
                 oknoprzegrana.close();
-                return true; // Indicates that a new game should start
+                return true; 
             }
             else if (czerwony.getGlobalBounds().contains(mousePos)) {
                 oknoprzegrana.close();
-                exit(0); // Close the entire program
+                exit(0); 
             }
         }
-        return false; // Indicates that no new game should start
+        return false; 
     }
 
     void narysujbloki() {
@@ -140,14 +140,14 @@ public:
 
             if (wygranablok.getGlobalBounds().contains(mousePos)) {
                 oknowygrana.close();
-                return true; // Indicates that a new game should start
+                return true; 
             }
             else if (zakonczblok.getGlobalBounds().contains(mousePos)) {
                 oknowygrana.close();
-                exit(0); // Close the entire program
+                exit(0); 
             }
         }
-        return false; // Indicates that no new game should start
+        return false; 
     }
 
     void narysujbloki() {
@@ -178,7 +178,7 @@ private:
     bool flashred;
     bool wygrana;
     bool przegrana;
-    int level; // New variable to keep track of the current level
+    int level; 
     int points;
     int rundy = 3;
 
@@ -225,7 +225,7 @@ public:
         text.setString("Hello, the Squares will turn green so you will remember \nthe sequence and then repeat it with the mouse to pass the level!");
         text.setCharacterSize(20); // w pikselach, nie punktach
         text.setFillColor(sf::Color::White);
-        text.setPosition(50, 50); // Ustaw pozycję tekstu
+        text.setPosition(50, 50); 
 
 
 
@@ -256,7 +256,7 @@ public:
     }
 
     void aktualizujKolory() {
-        if (przeliczanie < level) { // Use level to determine the sequence length
+        if (przeliczanie < level) { 
             sf::Time elapsed = clock.getElapsedTime();
 
             if (!bialycheck && elapsed.asSeconds() >= 1.0f) {
@@ -283,7 +283,7 @@ public:
         points = points + rundy;
         rundy += 1;
         inicjalizowaniepunkty();
-        narysujkwadraty(); // Ensure the squares and the updated points are drawn immediately
+        narysujkwadraty(); 
         narysujpunkty();
     }
 
@@ -291,7 +291,7 @@ public:
         points = 0;
         rundy += 3;
         inicjalizowaniepunkty();
-        narysujkwadraty(); // Ensure the squares and the updated points are drawn immediately
+        narysujkwadraty(); 
         narysujpunkty();
     }
 
@@ -410,9 +410,9 @@ public:
                         losewindow.pobierzoknoprzegana().close();
                     }
                     if (losewindow.sprawdzKlikniecie(event)) {
-                        przegrana = false; // Reset the lose state to allow the game to restart
+                        przegrana = false; 
                         level = 3;
-                        restartGame(); // Restart the game
+                        restartGame(); 
                     }
                 }
 
@@ -432,10 +432,10 @@ public:
                     }
                     if (winwindow.sprawdzKlikniecie(event)) {
 
-                        wygrana = false; // Reset the win state to allow the game to restart
-                        level++; // Increment the level
+                        wygrana = false; 
+                        level++; 
 
-                        restartGame(); // Restart the game
+                        restartGame(); 
                     }
                 }
 
